@@ -29,6 +29,28 @@ const routes = [
                     title: '用户管理'
                 },
                 component: () => import('@/views/User.vue')
+            },
+            {
+                name: 'dept',
+                path: '/system/dept',
+                meta: {
+                    title: '部门管理'
+                },
+                component: () => import('@/views/Dept.vue')
+            },{
+                name: 'role',
+                path: '/system/role',
+                meta: {
+                    title: '岗位管理'
+                },
+                component: () => import('@/views/Role.vue')
+            },{
+                name: 'leave',
+                path: '/system/leave',
+                meta: {
+                    title: '审批管理'
+                },
+                component: () => import('@/views/Leave.vue')
             }
         ]
     },

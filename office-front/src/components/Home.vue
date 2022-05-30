@@ -5,7 +5,7 @@ import BreadCrumb from "./BreadCrumb.vue";
 import { useStore } from 'vuex'
 const store = useStore()
 
-const userInfo = store.state.userInfo
+let userInfo = store.state.userInfo
 const noticeCount = computed(() => {
   return store.state.noticeCount
 })

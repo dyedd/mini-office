@@ -32,7 +32,7 @@ service.interceptors.response.use((res) => {
         ElMessage.error(TOKEN_INVALID)
         setTimeout(() => {
             router.push('/login')
-        }, 1500)
+        }, 1000)
         return Promise.reject(TOKEN_INVALID)
     } else {
         ElMessage.error(msg || NETWORK_ERROR)
