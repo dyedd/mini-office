@@ -31,7 +31,6 @@ router.get('/list', async (ctx) => {
       params = 'jobname =:name ';
       values.push(jobname);
     };
-    params.jobname = jobname;
     params.length > 0 ? params += ` AND rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`: params = `rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`;
     const res = await ctx.db.execute(
       `SELECT * FROM office_job WHERE ${params}`, 
