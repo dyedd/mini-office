@@ -15,7 +15,7 @@ router.get('/list', async (ctx) => {
     } else {
         result = await ctx.db.execute(
             `SELECT * FROM office_bm`
-            );
+        );
     }
 
     const rootList = util.merge2Json(result.metaData, result.rows);
@@ -51,24 +51,31 @@ function getTreeDept(rootList, id, list) {
 router.post('/operate', async (ctx) => {
     const {
         action,
-        ...params
+        params
     } = ctx.request.body;
-    let res, info;
+    let info;
     try {
         if (action == 'create') {
+            console.log(params);
             await ctx.db.execute(
-                `INSERT INTO office_bm VALUES (bm_seq.nextval, :bmm, :bmr, :parent)`,
-                [params.bmm,params.bmr,params.parent]);
+                `INSERT INTO office_bm(bmid,bmm,bmr,parent) VALUES (bm_seq.nextval, :bmm, :bmr, :parent)`,
+                [params.bmm, params.bmr, params.parent], {
+                    autoCommit: true
+                });
             info = "创建成功"
         } else if (action == 'edit') {
             await ctx.db.execute(
-                `UPDATE office_bm SET BMM=:bmm, BMR=:bmr, PARENT=:parent WHRER BMID = :id`,
-                [params.bmm,params.bmr,params.parent, params.bmid]);
+                `update office_bm set bmm=:bmm,bmr=:bmr,parent=:parent WHERE bmid =:id`,
+                [params.bmm, params.bmr, params.parent, params.bmid], {
+                    autoCommit: true
+                });
             info = "编辑成功"
         } else if (action == 'delete') {
             await ctx.db.execute(
-                `DELETE FROM office_bm WHRER BMID = :id`,
-                [params.bmid]);
+                `DELETE FROM office_bm WHERE BMID = :id`,
+                [params.bmid], {
+                    autoCommit: true
+                });
             info = "删除成功"
         }
         ctx.body = util.success('', info)
