@@ -38,7 +38,7 @@ router.post('/login', async (ctx) => {
       const token = jwt.sign({
         userid:data.userid
       }, 'dyedd', {
-        expiresIn: '1h'
+        expiresIn: '1d'
       })
       data.token = token;
       ctx.body = util.success(data)
@@ -53,7 +53,7 @@ router.post('/login', async (ctx) => {
 
 // 用户列表
 router.get('/list', async (ctx) => {
-  const { userId, userName, state } = ctx.request.query;
+  const { userid:userId, uname:userName, ustate:state } = ctx.request.query;
   const { page, skipIndex } = util.pager(ctx.request.query)
   let params = '';
   let values = [];
@@ -109,7 +109,7 @@ router.get('/all/list', async (ctx) => {
 // 用户删除/批量删除
 router.post('/delete', async (ctx) => {
   // 待删除的用户Id数组
-  const { userIds } = ctx.request.body
+  const { userids:userIds } = ctx.request.body
   const condition = []
   for (const user of userIds) {
     condition.push(user)
@@ -128,7 +128,7 @@ router.post('/delete', async (ctx) => {
 })
 // 用户新增/编辑
 router.post('/operate', async (ctx) => {
-  const { userId, userName, userEmail, mobile, sex, job, state, role, deptId, action } = ctx.request.body;
+  const { userid:userId, uname:userName, umail:userEmail, umobile:mobile, sex, job, ustate:state, urole:role, deptid:deptId, action } = ctx.request.body;
   if (action == 'add') {
     if (!userName || !userEmail) {
       ctx.body = util.fail('用户名或者邮箱为空', util.CODE.PARAM_ERROR)
@@ -158,8 +158,9 @@ router.post('/operate', async (ctx) => {
           ],
           { autoCommit: true}
         )
-        console.log(res);
-        ctx.body = util.success('', '用户创建成功');
+        if(res.rowsAffected > 0){
+          ctx.body = util.success('', '用户创建成功');
+        }
       } catch (error) {
         ctx.body = util.fail(error.stack, '用户创建失败');
       }
