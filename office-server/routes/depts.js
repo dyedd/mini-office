@@ -1,16 +1,26 @@
 const router = require('koa-router')()
 const util = require('./../utils/util')
-const Dept = require('./../models/deptSchema')
-
 router.prefix('/dept')
 
 // 部门树形列表
 router.get('/list', async (ctx) => {
-    let { deptName } = ctx.request.query;
-    let params = {}
-    if (deptName) params.deptName = deptName;
-    let rootList = await Dept.find(params)
-    if (deptName) {
+    let {
+        deptname
+    } = ctx.request.query;
+    let result;
+    if (deptname) {
+        result = await ctx.db.execute(
+            `SELECT * FROM office_bm where bmm = :name`,
+            [deptname]);
+    } else {
+        result = await ctx.db.execute(
+            `SELECT * FROM office_bm`
+        );
+    }
+
+    const rootList = util.merge2Json(result.metaData, result.rows);
+    console.log(rootList);
+    if (deptname) {
         ctx.body = util.success(rootList);
     } else {
         let tressList = getTreeDept(rootList, null, [])
@@ -23,13 +33,13 @@ router.get('/list', async (ctx) => {
 function getTreeDept(rootList, id, list) {
     for (let i = 0; i < rootList.length; i++) {
         let item = rootList[i]
-        if (String(item.parentId.slice().pop()) == String(id)) {
-            list.push(item._doc)
+        if (item.parent == id) {
+            list.push(item)
         }
     }
     list.map(item => {
         item.children = []
-        getTreeDept(rootList, item._id, item.children)
+        getTreeDept(rootList, item.bmid, item.children)
         if (item.children.length == 0) {
             delete item.children;
         }
@@ -39,19 +49,33 @@ function getTreeDept(rootList, id, list) {
 
 // 部门操作：创建、编辑、删除
 router.post('/operate', async (ctx) => {
-    const { _id, action, ...params } = ctx.request.body;
-    let res, info;
+    const {
+        action,
+        params
+    } = ctx.request.body;
+    let info;
     try {
         if (action == 'create') {
-            await Dept.create(params)
+            console.log(params);
+            await ctx.db.execute(
+                `INSERT INTO office_bm(bmid,bmm,bmr,parent) VALUES (bm_seq.nextval, :bmm, :bmr, :parent)`,
+                [params.bmm, params.bmr, params.parent], {
+                    autoCommit: true
+                });
             info = "创建成功"
         } else if (action == 'edit') {
-            params.updateTime = new Date()
-            await Dept.findByIdAndUpdate(_id, params)
+            await ctx.db.execute(
+                `update office_bm set bmm=:bmm,bmr=:bmr,parent=:parent WHERE bmid =:id`,
+                [params.bmm, params.bmr, params.parent, params.bmid], {
+                    autoCommit: true
+                });
             info = "编辑成功"
         } else if (action == 'delete') {
-            await Dept.findByIdAndRemove(_id)
-            await Dept.deleteMany({ parentId: { $all: [_id] } })
+            await ctx.db.execute(
+                `DELETE FROM office_bm WHERE BMID = :id`,
+                [params.bmid], {
+                    autoCommit: true
+                });
             info = "删除成功"
         }
         ctx.body = util.success('', info)
