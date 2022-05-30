@@ -56,7 +56,6 @@ router.post('/operate', async (ctx) => {
     let info;
     try {
         if (action == 'create') {
-            console.log(params);
             await ctx.db.execute(
                 `INSERT INTO office_bm(bmid,bmm,bmr,parent) VALUES (bm_seq.nextval, :bmm, :bmr, :parent)`,
                 [params.bmm, params.bmr, params.parent], {
