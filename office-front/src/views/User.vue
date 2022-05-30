@@ -5,7 +5,7 @@ import utils from "./../utils/utils";
 const { appContext } = getCurrentInstance();
 // 初始化用户表单对象
 const user = reactive({
-  state: '在职',
+  ustate: '在职',
 });
 // 初始化用户列表数据
 const userList = ref([]);
@@ -20,7 +20,7 @@ const checkedUserIds = ref([]);
 const showModal = ref(false);
 // 新增用户Form对象
 const userForm = reactive({
-  state: '',
+  ustate: '',
 });
 // 所有角色列表
 const roleList = ref([]);
@@ -30,14 +30,14 @@ const deptList = ref([]);
 const action = ref("add");
 // 定义表单校验规则
 const rules = reactive({
-  userName: [
+  uname: [
     {
       required: true,
       message: "请输入用户名称",
       trigger: "blur",
     },
   ],
-  userEmail: [
+  umail: [
     { required: true, message: "请输入用户邮箱", trigger: "blur" },
   ],
   mobile: [
@@ -120,25 +120,25 @@ const handleCurrentChange = (current) => {
 // 用户单个删除
 const handleDel = async (row) => {
   await appContext.config.globalProperties.$api.userDel({
-    userIds: [row.userid], //可单个删除，也可批量删除
+    userids: [row.userid], //可单个删除，也可批量删除
   });
-  message.success("删除成功");
+  ElMessage.success("删除成功");
   getUserList();
 };
 // 批量删除
 const handlePatchDel = async () => {
   if (checkedUserIds.value.length == 0) {
-    message.error("请选择要删除的用户");
+    ElMessage.error("请选择要删除的用户");
     return;
   }
   const res = await appContext.config.globalProperties.$api.userDel({
-    userIds: checkedUserIds.value, //可单个删除，也可批量删除
+    userids: checkedUserIds.value, //可单个删除，也可批量删除
   });
   if (res.nModified > 0) {
-    message.success("删除成功");
+    ElMessage.success("删除成功");
     getUserList();
   } else {
-    message.success("修改失败");
+    ElMessage.success("修改失败");
   }
 };
 
@@ -146,7 +146,7 @@ const handlePatchDel = async () => {
 const handleSelectionChange = (list) => {
   let arr = [];
   list.map((item) => {
-    arr.push(item.userId);
+    arr.push(item.userid);
   });
   checkedUserIds.value = arr;
 };
@@ -176,11 +176,11 @@ const handleSubmit = (dialogForm) => {
   dialogForm.validate(async (valid) => {
     if (valid) {
       let params = toRaw(userForm);
-      params.userEmail += "@edu.tust.com";
+      params.userEmail += "@edu.tust.cn";
       params.action = action.value;
       let res = await appContext.config.globalProperties.$api.userSubmit(params);
       showModal.value = false;
-      message.success("用户创建成功");
+      ElMessage.success("用户创建成功");
       handleReset(dialogForm);
       getUserList();
     }
@@ -200,14 +200,14 @@ const handleEdit = (row) => {
   <div class="user-manage">
     <div class="query-form">
       <el-form ref="form" :inline="true" :model="user">
-        <el-form-item label="用户ID" prop="userId">
-          <el-input v-model="user.userId" placeholder="请输入用户ID" />
+        <el-form-item label="用户ID" prop="userid">
+          <el-input v-model="user.userid" placeholder="请输入用户ID" />
         </el-form-item>
-        <el-form-item label="用户名称" prop="userName">
-          <el-input v-model="user.userName" placeholder="请输入用户名称" />
+        <el-form-item label="用户名称" prop="uname">
+          <el-input v-model="user.uname" placeholder="请输入用户名称" />
         </el-form-item>
-        <el-form-item label="状态" prop="state">
-          <el-select v-model="user.state">
+        <el-form-item label="状态" prop="ustate">
+          <el-select v-model="user.ustate">
             <el-option value="0" label="所有"></el-option>
             <el-option value="在职" label="在职"></el-option>
             <el-option value="离职" label="离职"></el-option>
@@ -240,39 +240,39 @@ const handleEdit = (row) => {
       <el-pagination class="pagination" background layout="prev, pager, next" :total="pager.total"
         :page-size="pager.pageSize" @current-change="handleCurrentChange" />
     </div>
-    <el-dialog title="用户新增" v-model="showModal">
+    <el-dialog :title="action=='add'?'用户新增':'用户编辑'" v-model="showModal">
       <el-form ref="dialogForm" :model="userForm" label-width="100px" :rules="rules">
-        <el-form-item label="用户名" prop="userName">
-          <el-input v-model="userForm.userName" :disabled="action == 'edit'" placeholder="请输入用户名称" />
+        <el-form-item label="用户名" prop="uname">
+          <el-input v-model="userForm.uname" :disabled="action == 'edit'" placeholder="请输入用户名称" />
         </el-form-item>
-        <el-form-item label="邮箱" prop="userEmail">
-          <el-input v-model="userForm.userEmail" :disabled="action == 'edit'" placeholder="请输入用户邮箱">
-            <template #append>@qq.com</template>
+        <el-form-item label="邮箱" prop="umail">
+          <el-input v-model="userForm.umail" :disabled="action == 'edit'" placeholder="请输入用户邮箱">
+            <template #append>@edu.tust.cn</template>
           </el-input>
         </el-form-item>
         <el-form-item label="手机号" prop="mobile">
-          <el-input v-model="userForm.mobile" placeholder="请输入手机号" />
+          <el-input v-model="userForm.umobile" placeholder="请输入手机号" />
         </el-form-item>
-        <el-form-item label="岗位" prop="job">
+        <el-form-item label="岗位">
           <el-input v-model="userForm.job" placeholder="请输入岗位" />
         </el-form-item>
-        <el-form-item label="状态" prop="state">
-          <el-select v-model="userForm.state">
+        <el-form-item label="状态">
+          <el-select v-model="userForm.ustate">
             <el-option value="在职" label="在职"></el-option>
             <el-option value="离职" label="离职"></el-option>
             <el-option value="实习" label="实习"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="系统角色" prop="roleList">
+        <!-- <el-form-item label="系统角色" prop="roleList">
           <el-select v-model="userForm.urole" placeholder="请选择用户系统角色" multiple style="width: 100%">
             <el-option v-for="role in roleList" :key="role._id" :label="role.roleName" :value="role._id"></el-option>
           </el-select>
-        </el-form-item>
-        <el-form-item label="部门" prop="deptId">
+        </el-form-item> -->
+        <!-- <el-form-item label="部门" prop="deptId">
           <el-cascader v-model="userForm.deptId" placeholder="请选择所属部门" :options="deptList"
             :props="{ checkStrictly: true, value: '_id', label: 'deptName' }" clearable style="width: 100%">
           </el-cascader>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
       <template #footer>
         <span class="dialog-footer">
