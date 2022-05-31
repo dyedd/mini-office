@@ -2,8 +2,6 @@
  * 用户管理模块
  */
 const router = require('koa-router')()
-const Leave = require('../models/leaveSchema')
-const Dept = require('../models/deptSchema')
 const util = require('../utils/util')
 const jwt = require('jsonwebtoken')
 const md5 = require('md5')
@@ -11,51 +9,50 @@ router.prefix('/leave')
 
 // 查询申请列表
 router.get('/list', async (ctx) => {
-  const { applyState, type } = ctx.request.query;
+  const { leavetype,lstate } = ctx.request.query;
   const { page, skipIndex } = util.pager(ctx.request.query)
-  let authorization = ctx.request.headers.authorization;
-  let { data } = util.decoded(authorization)
   try {
-    let params = {};
-    if (type == 'approve') {
-      if (applyState == 1 || applyState == 2) {
-        params.curAuditUserName = data.userName;
-        params.$or = [{ applyState: 1 }, { applyState: 2 }]
-      } else if (applyState > 2) {
-        params = { "auditFlows.userId": data.userId, applyState }
-      } else {
-        params = { "auditFlows.userId": data.userId }
+    let params = '';
+    let values = [];
+    if (leavetype){
+      params = 'leavetype =:type ';
+      values.push(leavetype);
+    };
+    if (leavetype){
+      params.length>0 ? params += 'AND lstate =:state ' : params = 'lstate =:state ';
+      values.push(lstate);
+    };
+    params.length > 0 ? params += ` AND rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`: params = `rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`;
+    const res = await ctx.db.execute(
+      `SELECT * FROM office_leave WHERE ${params}`, 
+      values,
+      {
+        maxRows: page.pageSize,
       }
-    } else {
-      params = {
-        "applyUser.userId": data.userId
-      }
-      if (applyState) params.applyState = applyState;
-    }
-    const query = Leave.find(params)
-    const list = await query.skip(skipIndex).limit(page.pageSize)
-    const total = await Leave.countDocuments(params);
+    )
+
+    const list = util.merge2Json(res.metaData,res.rows);
     ctx.body = util.success({
       page: {
         ...page,
-        total
+        total: list.length
       },
       list
     })
-
   } catch (error) {
-    ctx.body = util.fail(`查询失败:${error.stack}`)
+    ctx.body = util.fail(`查询失败：${error.stack}`)
   }
 })
 
 router.get("/count", async (ctx) => {
-  let authorization = ctx.request.headers.authorization;
-  let { data } = util.decoded(authorization);
   try {
-    let params = {}
-    params.curAuditUserName = data.userName;
-    params.$or = [{ applyState: 1 }, { applyState: 2 }]
-    const total = await Leave.countDocuments(params)
+    const res = await ctx.db.execute(
+      `SELECT * FROM office_leave WHERE ${params}`, 
+      values,
+      {
+        maxRows: page.pageSize,
+      }
+    )
     ctx.body = util.success(total)
   } catch (error) {
     ctx.body = util.fail(`查询异常：${error.message}`)
