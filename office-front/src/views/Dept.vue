@@ -190,6 +190,7 @@ function handleSubmit() {
                 handleClose();
                 getDeptList();
             } catch (err) {
+                console.log(err);
                 ElMessage.error(`操作失败`);
             }
         }
