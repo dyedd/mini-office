@@ -8,7 +8,6 @@ const mypw = 'office123';
 
 const run = async (ctx,next)=>{
     try {
-        console.log(config.URL);
         let connParam = {
             user: "office",
             password: mypw,

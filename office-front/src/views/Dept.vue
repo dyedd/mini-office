@@ -15,35 +15,37 @@
             <div class="action">
                 <el-button type="primary" @click="handleOpen">创建</el-button>
             </div>
-            <el-table :data="deptList" row-key="_id" :tree-props="{ children: 'children' }" stripe>
+            <el-table :data="deptList" row-key="bmid" :tree-props="{ children: 'children' }" stripe>
                 <el-table-column v-for="item in columns" :key="item.prop" v-bind="item"></el-table-column>
                 <el-table-column label="操作">
                     <template #default="scope">
                         <el-button size="mini" type="primary" @click="handleEdit(scope.row)">编辑</el-button>
-                        <el-button size="mini" type="danger" @click="handleDel(scope.row._id)">删除</el-button>
+                        <el-button size="mini" type="danger" @click="handleDel(scope.row.bmid)">删除</el-button>
                     </template>
                 </el-table-column>
             </el-table>
         </div>
         <el-dialog :title="action == 'create' ? '创建部门' : '编辑部门'" v-model="showModal">
             <el-form ref="dialogFormRef" :model="deptForm" :rules="rules" label-width="120px">
-                <el-form-item label="上级部门" prop="parentid">
-                    <el-cascader placeholder="请选择上级部门" v-model="deptForm.parentid"
-                        :props="{ checkStrictly: true, value: '_id', label: 'deptname' }" clearable :options="deptList"
+                <el-form-item label="上级部门" prop="parent">
+                    <el-cascader placeholder="请选择上级部门" v-model="deptForm.parent"
+                        :props="{  value: 'bmid', label: 'bmm', checkStrictly: true }" clearable :options="deptList"
                         :show-all-levels="true"></el-cascader>
                 </el-form-item>
-                <el-form-item label="部门名称" prop="deptname">
-                    <el-input placeholder="请输入部门名称" v-model="deptForm.deptname"></el-input>
+                <el-form-item label="部门名称" prop="bmm">
+                    <el-input placeholder="请输入部门名称" v-model="deptForm.bmm"></el-input>
                 </el-form-item>
-                <el-form-item label="负责人" prop="user">
+                <el-form-item label="负责人" prop="bmr">
                     <el-select placeholder="请选择部门负责人" v-model="deptForm.user" @change="handleUser">
-                        <el-option v-for="item in userList" :key="item.userid" :label="item.username" :value="item">
+                        <el-option v-for="item in userList" :key="item.userid" :label="item.uname" :value="item">
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="负责人邮箱" prop="useremail">
-                    <el-input placeholder="请输入负责人邮箱" v-model="deptForm.useremail" disabled></el-input>
+                <template v-if="deptForm.user">
+                <el-form-item label="负责人邮箱" prop="user.umail">
+                    <el-input placeholder="请输入负责人邮箱" v-model="deptForm.user.umail" disabled></el-input>
                 </el-form-item>
+                </template>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -67,11 +69,11 @@ let queryForm = reactive({
 let columns = [
     {
         label: "部门名称",
-        prop: "deptname",
+        prop: "bmm",
     },
     {
         label: "负责人",
-        prop: "username",
+        prop: "bmr",
     }
     ,
     {
@@ -83,17 +85,7 @@ let columns = [
         prop: "createtime",
     },
 ];
-let deptList = ref([{
-    deptname: "Superior1",
-    username: "PrincipalName",
-    updatetime: "1970-01-01 00:00",
-    createtime: "1970-01-01 00:00",
-}, {
-    deptname: "Superior1",
-    username: "PrincipalName",
-    updatetime: "1970-01-01 00:00",
-    createtime: "1970-01-01 00:00",
-}]);
+let deptList = ref([]);
 
 let pager = {
     pageNum: 1,
@@ -103,18 +95,17 @@ let pager = {
 let action = ref("create");
 let showModal = ref(false);
 let deptForm = reactive({
-    parentid: [],
 });
-let userList = [{ userid: 1, username: "Username", useremail: "mail@example.com" }];
+let userList = ref([]);
 let rules = {
-    parentid: [
+    parent: [
         {
-            required: true,
+            required: false,
             message: "请选择上级部门",
             trigger: "blur",
         },
     ],
-    deptname: [
+    bmm: [
         {
             required: true,
             message: "请输入部门名称",
@@ -141,11 +132,12 @@ function getDeptList() {
 };
 function getAllUserList() {
     api.getAllUserList().then((list) => {
-        userList = list;
+        userList.value = list;
     })
 };
 function handleUser(val) {
-    Object.assign(deptForm, val);
+    deptForm.bmr = `${val.userid}`;
+    deptForm.umail = val.umail;
 };
 function handleReset(form) {
     form.resetFields();
@@ -155,19 +147,18 @@ function handleOpen() {
     showModal.value = true;
 };
 function handleEdit(row) {
-    action = "edit";
-    showModal = true;
-    nextTick(() => {
-        Object.assign(this.deptForm, row, {
-            user: `${row.userId}/${row.userName}/${row.userEmail}`,
+    action.value = "edit";
+    showModal.value = true;
+        Object.assign(this.deptForm, {...row,
+            user: userList.value.find(item => item.userid == row.bmr),
+            parent: [row.parent],
         });
-    })
 };
 function handleDel(_id) {
     (async () => {
-        action = "delete"
-        await api.deptOperate({ _id, action: this.action });
-        this.$message.success("删除成功");
+        action.value = "delete"
+        await api.deptOperate({ params: {bmid: _id}, action: action.value });
+        ElMessage.success("删除成功");
         getDeptList();
     })();
 };
@@ -180,14 +171,17 @@ function handleSubmit() {
         if (valid) {
             try {
 
-                let params = { ...deptForm, action: action.value };
-                delete params.user;
+                let params = { params: deptForm, action: action.value };
+                params.params.user = undefined;
+                if(params.params?.parent?.length){
+                    params.params.parent = params.params.parent[params.params.parent.length-1];
+                }
                 await api.deptOperate(params);
                 ElMessage({
                     message: "操作成功",
                     type: "success",
                 })
-                handleClose();
+                handleClose(dialogFormRef.value);
                 getDeptList();
             } catch (err) {
                 console.log(err);
