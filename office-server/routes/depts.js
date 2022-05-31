@@ -19,7 +19,7 @@ router.get('/list', async (ctx) => {
     }
 
     const rootList = util.merge2Json(result.metaData, result.rows);
-    console.log(rootList);
+    // console.log(rootList);
     if (deptname) {
         ctx.body = util.success(rootList);
     } else {

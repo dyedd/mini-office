@@ -56,17 +56,17 @@ export default {
             data: params
         })
     },
-    getRoleAllList() {
+    getJobAllList() {
         return request({
-            url: '/roles/allList',
+            url: '/jobs/allList',
             method: 'get',
             data: {},
             mock: false
         })
     },
-    getRoleList(params) {
+    getJobList(params) {
         return request({
-            url: '/roles/list',
+            url: '/jobs/list',
             method: 'get',
             data: params,
             mock: false
@@ -104,9 +104,9 @@ export default {
             mock: false
         })
     },
-    roleOperate(params) {
+    jobOperate(params) {
         return request({
-            url: '/roles/operate',
+            url: '/jobs/operate',
             method: 'post',
             data: params,
             mock: false
@@ -114,7 +114,7 @@ export default {
     },
     updatePermission(params) {
         return request({
-            url: '/roles/update/permission',
+            url: '/jobs/update/permission',
             method: 'post',
             data: params,
             mock: false

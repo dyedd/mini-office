@@ -93,7 +93,7 @@ const form = ref();
 onMounted(() => {
   getUserList();
   getDeptList();
-  getRoleAllList();
+  getJobAllList();
 });
 // 获取用户列表
 const getUserList = async () => {
@@ -158,18 +158,19 @@ const handleCreate = () => {
 
 const getDeptList = async () => {
   let list = await appContext.config.globalProperties.$api.getDeptList();
+  console.log(list,222);
   deptList.value = list;
 };
 
 // 角色列表查询
-const getRoleAllList = async () => {
-  let list = await appContext.config.globalProperties.$api.getRoleAllList();
+const getJobAllList = async () => {
+  let list = await appContext.config.globalProperties.$api.getJobAllList();
   roleList.value = list;
 };
 // 用户弹窗关闭
 const handleClose = () => {
   showModal.value = false;
-  handleReset("dialogForm");
+  handleReset(dialogForm);
 };
 // 用户提交
 const handleSubmit = (dialogForm) => {
@@ -240,7 +241,7 @@ const handleEdit = (row) => {
       <el-pagination class="pagination" background layout="prev, pager, next" :total="pager.total"
         :page-size="pager.pageSize" @current-change="handleCurrentChange" />
     </div>
-    <el-dialog :title="action=='add'?'用户新增':'用户编辑'" v-model="showModal">
+    <el-dialog :title="action == 'add' ? '用户新增' : '用户编辑'" v-model="showModal">
       <el-form ref="dialogForm" :model="userForm" label-width="100px" :rules="rules">
         <el-form-item label="用户名" prop="uname">
           <el-input v-model="userForm.uname" :disabled="action == 'edit'" placeholder="请输入用户名称" />
@@ -253,8 +254,11 @@ const handleEdit = (row) => {
         <el-form-item label="手机号" prop="mobile">
           <el-input v-model="userForm.umobile" placeholder="请输入手机号" />
         </el-form-item>
-        <el-form-item label="岗位">
-          <el-input v-model="userForm.job" placeholder="请输入岗位" />
+        <el-form-item label="身份">
+          <el-select v-model="userForm.urole">
+            <el-option value="员工" label="员工"></el-option>
+            <el-option value="管理员" label="管理员"></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="userForm.ustate">
@@ -263,16 +267,16 @@ const handleEdit = (row) => {
             <el-option value="实习" label="实习"></el-option>
           </el-select>
         </el-form-item>
-        <!-- <el-form-item label="系统角色" prop="roleList">
-          <el-select v-model="userForm.urole" placeholder="请选择用户系统角色" multiple style="width: 100%">
-            <el-option v-for="role in roleList" :key="role._id" :label="role.roleName" :value="role._id"></el-option>
+        <el-form-item label="岗位" prop="roleList">
+          <el-select v-model="userForm.job" placeholder="请选择用户岗位" style="width: 100%">
+            <el-option v-for="role in roleList" :key="role.jobid" :label="role.jobname" :value="role.jobid"></el-option>
           </el-select>
-        </el-form-item> -->
-        <!-- <el-form-item label="部门" prop="deptId">
-          <el-cascader v-model="userForm.deptId" placeholder="请选择所属部门" :options="deptList"
-            :props="{ checkStrictly: true, value: '_id', label: 'deptName' }" clearable style="width: 100%">
+        </el-form-item>
+        <el-form-item label="部门" prop="deptId">
+          <el-cascader v-model="userForm.deptid" placeholder="请选择所属部门" :options="deptList"
+            :props="{ emitPath: false, value: 'bmid', label: 'bmm' }" clearable style="width: 100%">
           </el-cascader>
-        </el-form-item> -->
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">

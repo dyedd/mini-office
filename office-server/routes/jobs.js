@@ -28,7 +28,7 @@ router.get('/list', async (ctx) => {
     let params = '';
     let values = [];
     if (jobname){
-      params = 'jobname =:name ';
+      params = `INSTR(jobname, :name)>0 `;
       values.push(jobname);
     };
     params.length > 0 ? params += ` AND rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`: params = `rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`;
@@ -68,7 +68,7 @@ router.post('/operate', async (ctx) => {
     } else if (action == 'edit') {
       if (jobid) {
         res = await ctx.db.execute(
-          `update office_job set jobname:=name WHERE jobid =:id`,
+          `update office_job set jobname=:0 WHERE jobid =:1`,
           [jobname,jobid], {
               autoCommit: true
           });
@@ -80,7 +80,7 @@ router.post('/operate', async (ctx) => {
     } else {
       if (jobid) {
         res = await ctx.db.execute(
-          `DELETE FROM office_job WHERE BMID = :id`,
+          `DELETE FROM office_job WHERE jobid = :id`,
           [jobid], {
               autoCommit: true
           });

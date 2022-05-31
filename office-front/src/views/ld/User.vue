@@ -111,7 +111,7 @@ import utils from "./../utils/utils";
     onMounted(() => {
       getUserList();
       getDeptList();
-      getRoleList();
+      getJobList();
     });
     // 获取用户列表
     const getUserList = async () => {
@@ -180,8 +180,8 @@ import utils from "./../utils/utils";
     };
 
     // 角色列表查询
-    const getRoleList = async () => {
-      let list = await ctx.$api.getRoleList();
+    const getJobList = async () => {
+      let list = await ctx.$api.getJobList();
       roleList.value = list;
     };
     // 用户弹窗关闭
