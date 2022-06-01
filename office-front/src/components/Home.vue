@@ -36,8 +36,8 @@ const handleLogout = (key) => {
         <img src="./../assets/logo.png" />
         <span>管理面板</span>
       </div>
-        <!-- 导航菜单 -->
-        <TreeMenu></TreeMenu>
+      <!-- 导航菜单 -->
+      <TreeMenu></TreeMenu>
     </div>
     <div :class="['content-right']">
       <div class="nav-top">
@@ -47,14 +47,9 @@ const handleLogout = (key) => {
           </div>
         </div>
         <div class="user-info">
-          <!-- <el-badge :is-dot="noticeCount > 0 ? true : false" class="notice" type="danger"
-            @click="router.push('/audit/approve')">
-            <i-ep-bell />
-          </el-badge> -->
           <el-dropdown @command="handleLogout">
             <span class="user-link">
               {{ userInfo.uname }}
-              <i-ep-right />
             </span>
             <template #dropdown>
               <el-dropdown-menu>
@@ -118,19 +113,11 @@ const handleLogout = (key) => {
       .nav-left {
         display: flex;
         align-items: center;
-
-        .menu-fold {
-          margin-right: 15px;
-          font-size: 18px;
-        }
       }
 
       .user-info {
-        .notice {
-          line-height: 30px;
-          margin-right: 15px;
-          cursor: pointer;
-        }
+        display: flex;
+        align-items: center;
 
         .user-link {
           cursor: pointer;
