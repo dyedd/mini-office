@@ -24,7 +24,7 @@ router.get('/list', async (ctx) => {
       params = 'leavetype =:type ';
       values.push(leavetype);
     };
-    if (leavetype) {
+    if (lstate) {
       params.length > 0 ? params += 'AND lstate =:state ' : params = 'lstate =:state ';
       values.push(lstate);
     };
@@ -64,14 +64,16 @@ router.post("/operate", async (ctx) => {
   const {
     leaveid,
     action,
-    params
+    params,
   } = ctx.request.body
+  params.lstart = new Date(params.lstart);
+  params.lend = new Date(params.lend);
   let authorization = ctx.request.headers.authorization;
   let {
-    data
+    userid
   } = util.decoded(authorization)
   if (action == 'create') {
-    let orderNo = "XJ"
+    let orderNo = "X"
     orderNo += util.formateDate(new Date(), "yyyyMMdd");
     const number = await ctx.db.execute(
       `SELECT count(*) FROM office_leave`,
@@ -79,7 +81,7 @@ router.post("/operate", async (ctx) => {
     orderNo += number.rows[0][0];
     const res = await ctx.db.execute(
       `INSERT INTO office_leave(leaveid,leavetype,lstart,lend,reason,lstate,applicant,approver) 
-      VALUES (:0,:1,:2,:3,:4,:5,:6,:7,:8)`,
+      VALUES (:0,:1,:2,:3,:4,:5,:6,:7)`,
       [
         orderNo,
         params.leavetype,
@@ -87,7 +89,7 @@ router.post("/operate", async (ctx) => {
         params.lend,
         params.reason,
         '待审批',
-        data.userid,
+        userid,
         params.approver
       ], {
         autoCommit: true
