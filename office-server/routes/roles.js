@@ -95,5 +95,18 @@ router.post('/operate', async (ctx) => {
     ctx.body = util.fail(error.stack)
   }
 })
-
+// 权限设置
+router.post('/update/permission', async (ctx) => {
+  const { id, permissionList } = ctx.request.body;
+  try {
+    res = await ctx.db.execute(
+      `update office_role set permission=:0 WHERE roleid =:1`,
+      [permissionList,id], {
+          autoCommit: true
+      });
+    ctx.body = util.success('', "权限设置成功")
+  } catch (error) {
+    ctx.body = util.fail("权限设置失败")
+  }
+})
 module.exports = router;

@@ -109,8 +109,8 @@ const handleQuery = () => {
   getUserList();
 };
 // 重置查询表单
-const handleReset = (form) => {
-  form.resetFields();
+const handleReset = () => {
+  form.value.resetFields();
 };
 // 分页事件处理
 const handleCurrentChange = (current) => {
@@ -169,11 +169,11 @@ const getRoleAllList = async () => {
 // 用户弹窗关闭
 const handleClose = () => {
   showModal.value = false;
-  handleReset(dialogForm);
+  handleReset(dialogForm.value);
 };
 // 用户提交
-const handleSubmit = (dialogForm) => {
-  dialogForm.validate(async (valid) => {
+const handleSubmit = () => {
+  dialogForm.value.validate(async (valid) => {
     if (valid) {
       let params = toRaw(userForm);
       params.userEmail += "@edu.tust.cn";
@@ -185,7 +185,7 @@ const handleSubmit = (dialogForm) => {
       }else{
         ElMessage.success("用户创建成功");
       }
-      handleReset(dialogForm);
+      handleReset(dialogForm.value);
       getUserList();
     }
   });
@@ -220,7 +220,7 @@ const handleEdit = (row) => {
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="handleQuery">查询</el-button>
-          <el-button @click="handleReset(form)">重置</el-button>
+          <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -281,7 +281,7 @@ const handleEdit = (row) => {
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="handleClose">取 消</el-button>
-          <el-button type="primary" @click="handleSubmit(dialogForm)">确 定</el-button>
+          <el-button type="primary" @click="handleSubmit">确 定</el-button>
         </span>
       </template>
     </el-dialog>
