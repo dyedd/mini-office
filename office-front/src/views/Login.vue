@@ -32,6 +32,7 @@ const login = (userFormRef) => {
       console.log(user);
       appContext.config.globalProperties.$api.login(user).then(async (res) => {
         store.commit("saveUserInfo", res);
+        store.dispatch("fetchRoleInfo");
         router.push("/welcome");
       });
     } else {

@@ -1,7 +1,29 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { ref, reactive, computed } from "vue";
+import store from "../store/index";
 const activeMenu = ref(location.hash.slice(1));
-console.log(activeMenu.value);
+// I wonder just saving a variable from store to local varibale, will the variable still be reactive?
+const roleInfo = computed(() => {
+  return store.state.roleInfo;
+})
+
+// current permissions: user dept role
+function checkPermission(permission){
+  if(!roleInfo.value?.permission){
+    return false;
+  }
+  if(typeof permission == 'string'){
+    return roleInfo.value.permission.indexOf(permission) != -1;
+  }else if(Array.isArray(permission)){
+    for(let item of permission){
+      if(roleInfo.value.permission.indexOf(item)==-1){
+        return false;
+      }
+      return true;
+    }
+  }
+  throw new Error("permission should either be an array or a string");
+}
 </script>
 <template>
 
@@ -10,15 +32,15 @@ console.log(activeMenu.value);
       <i-ep-setting style="margin-right: 8px" />
       <span>系统管理</span>
     </el-menu-item>
-    <el-menu-item index="/system/user">
+    <el-menu-item index="/system/user" :disabled="!checkPermission(['user'])">
       <i-ep-user style="margin-right: 8px" />
       <span>用户管理</span>
     </el-menu-item>
-    <el-menu-item index="/system/dept">
+    <el-menu-item index="/system/dept" :disabled="!checkPermission('dept')">
       <i-ep-stopwatch style="margin-right: 8px" />
       <span>部门管理</span>
     </el-menu-item>
-    <el-menu-item index="/system/role">
+    <el-menu-item index="/system/role" :disabled="!checkPermission('role')">
       <i-ep-place style="margin-right: 8px" />
       <span>角色管理</span>
     </el-menu-item>

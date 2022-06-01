@@ -117,7 +117,7 @@ const queryForm = reactive({
 });
 const pager = reactive({
     pageNum: 1,
-    pageSize: 10,
+    pageSize: 99,
     total: 0,
 });
 // 定义动态表格-格式

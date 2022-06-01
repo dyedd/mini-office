@@ -2,6 +2,7 @@
 import { ElMessage } from "element-plus";
 import { getCurrentInstance, nextTick, onMounted, reactive, toRaw } from "vue";
 import utils from "../utils/utils";
+import store from "../store/index";
 const { appContext } = getCurrentInstance();
 const queryForm = reactive({
   rolename: "",
@@ -148,7 +149,9 @@ const handlePermissionSubmit = async () => {
   await appContext.config.globalProperties.$api.updatePermission(params);
   showPermission.value = false;
   ElMessage.success("设置成功");
-  getRoleList();
+  store.dispatch("fetchRoleInfo");
+  await getRoleList();
+
 }
 </script>
 <template>

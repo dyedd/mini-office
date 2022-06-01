@@ -143,5 +143,21 @@ export default {
             data: params,
             mock: false
         })
+    },
+    getRoleByID(id){
+        if(id == null){
+            throw new Error("id should not be null or undefined");
+        }
+        // since there isn't a corresponding function in the backend
+        // just get all roles and find the one by id
+        return this.getRoleAllList().then((response)=>{
+            if(response && response.length!==0){
+                const result = response.find(item => item.roleid==id);
+                result.permission = JSON.parse(result.permission);
+                return result;
+            }else {
+                throw new Error("Role list is empty, then how could you call getRoleById");
+            }
+        });
     }
 }

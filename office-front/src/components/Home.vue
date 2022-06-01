@@ -4,6 +4,7 @@ import TreeMenu from "./TreeMenu.vue";
 import BreadCrumb from "./BreadCrumb.vue";
 import { useStore } from 'vuex'
 const store = useStore()
+import router from "../router/index";
 
 let userInfo = store.state.userInfo
 const noticeCount = computed(() => {
