@@ -115,7 +115,7 @@ router.post('/delete', async (ctx) => {
     condition.push(user)
   }
   const res = await ctx.db.execute(
-    `update office_users set ustate=:ustate WHERE userid = ${condition.join(',')}`,
+    `update office_users set ustate=:ustate WHERE userid in (${condition.join(',')})`,
     ['离职'], 
     { autoCommit: true } // commit once for all DML in the script
   )
@@ -166,10 +166,6 @@ router.post('/operate', async (ctx) => {
       }
     }
   } else {
-    if (!deptId) {
-      ctx.body = util.fail('部门不能为空', util.CODE.PARAM_ERROR)
-      return;
-    }
     try {
       const res = await ctx.db.execute(
         `update office_users set umobile=:umobile,ustate=:ustate,deptid=:deptid,job=:job,urole=:urole WHERE userid =:id`,

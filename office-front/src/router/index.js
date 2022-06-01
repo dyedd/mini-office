@@ -38,12 +38,12 @@ const routes = [
                 },
                 component: () => import('@/views/Dept.vue')
             },{
-                name: 'job',
-                path: '/system/job',
+                name: 'role',
+                path: '/system/role',
                 meta: {
-                    title: '岗位管理'
+                    title: '角色管理'
                 },
-                component: () => import('@/views/Job.vue')
+                component: () => import('@/views/Role.vue')
             },{
                 name: 'leave',
                 path: '/system/leave',

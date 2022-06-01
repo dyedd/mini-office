@@ -93,7 +93,7 @@ const form = ref();
 onMounted(() => {
   getUserList();
   getDeptList();
-  getJobAllList();
+  getRoleAllList();
 });
 // 获取用户列表
 const getUserList = async () => {
@@ -134,7 +134,7 @@ const handlePatchDel = async () => {
   const res = await appContext.config.globalProperties.$api.userDel({
     userids: checkedUserIds.value, //可单个删除，也可批量删除
   });
-  if (res.nModified > 0) {
+  if (res.nModified > 0 || res.rowsAffected > 0) {
     ElMessage.success("删除成功");
     getUserList();
   } else {
@@ -158,13 +158,12 @@ const handleCreate = () => {
 
 const getDeptList = async () => {
   let list = await appContext.config.globalProperties.$api.getDeptList();
-  console.log(list,222);
   deptList.value = list;
 };
 
 // 角色列表查询
-const getJobAllList = async () => {
-  let list = await appContext.config.globalProperties.$api.getJobAllList();
+const getRoleAllList = async () => {
+  let list = await appContext.config.globalProperties.$api.getRoleAllList();
   roleList.value = list;
 };
 // 用户弹窗关闭
@@ -181,7 +180,11 @@ const handleSubmit = (dialogForm) => {
       params.action = action.value;
       let res = await appContext.config.globalProperties.$api.userSubmit(params);
       showModal.value = false;
-      ElMessage.success("用户创建成功");
+      if(action.value == "edit"){
+        ElMessage.success("用户编辑成功");
+      }else{
+        ElMessage.success("用户创建成功");
+      }
       handleReset(dialogForm);
       getUserList();
     }
@@ -254,11 +257,8 @@ const handleEdit = (row) => {
         <el-form-item label="手机号" prop="mobile">
           <el-input v-model="userForm.umobile" placeholder="请输入手机号" />
         </el-form-item>
-        <el-form-item label="身份">
-          <el-select v-model="userForm.urole">
-            <el-option value="员工" label="员工"></el-option>
-            <el-option value="管理员" label="管理员"></el-option>
-          </el-select>
+        <el-form-item label="岗位">
+          <el-input v-model="userForm.job" placeholder="请输入岗位" />
         </el-form-item>
         <el-form-item label="状态">
           <el-select v-model="userForm.ustate">
@@ -267,9 +267,9 @@ const handleEdit = (row) => {
             <el-option value="实习" label="实习"></el-option>
           </el-select>
         </el-form-item>
-        <el-form-item label="岗位" prop="roleList">
-          <el-select v-model="userForm.job" placeholder="请选择用户岗位" style="width: 100%">
-            <el-option v-for="role in roleList" :key="role.jobid" :label="role.jobname" :value="role.jobid"></el-option>
+        <el-form-item label="角色" prop="roleList">
+          <el-select v-model="userForm.urole" placeholder="请选择用户角色" style="width: 100%">
+            <el-option v-for="role in roleList" :key="role.roleid" :label="role.rolename" :value="role.roleid"></el-option>
           </el-select>
         </el-form-item>
         <el-form-item label="部门" prop="deptId">
