@@ -8,11 +8,12 @@ const mypw = 'office123';
 
 const run = async (ctx,next)=>{
     try {
-        ctx.db = await oracledb.getConnection({
+        let connParam = {
             user: "office",
             password: mypw,
             connectString: config.URL
-        });
+        }
+        ctx.db = await oracledb.getConnection(connParam);
         await next();
 
     } catch (err) {

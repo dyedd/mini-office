@@ -14,11 +14,7 @@ router.post('/login', async (ctx) => {
       userName,
       userPwd
     } = ctx.request.body;
-    const res = await ctx.db.execute(
-      `BEGIN
-        login(:v_username, :v_password, :v_info);
-      END;`, 
-      {
+    const loginInfo = {
         v_username: userName,
         v_password: md5(userPwd),
         v_info: {
@@ -26,6 +22,11 @@ router.post('/login', async (ctx) => {
           dir: oracledb.BIND_OUT
         }
       }
+    const res = await ctx.db.execute(
+      `BEGIN
+        login(:v_username, :v_password, :v_info);
+      END;`,
+      loginInfo
     )
     const result = res.outBinds.v_info;
     const rows = await result.getRows();  
