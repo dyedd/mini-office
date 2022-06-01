@@ -20,7 +20,7 @@ console.log(activeMenu.value);
     </el-menu-item>
     <el-menu-item index="/system/role">
       <i-ep-place style="margin-right: 8px" />
-      <span>岗位管理</span>
+      <span>角色管理</span>
     </el-menu-item>
     <el-menu-item index="/system/leave">
       <i-ep-stamp style="margin-right: 8px" />

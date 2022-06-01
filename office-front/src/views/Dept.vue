@@ -25,7 +25,7 @@
                 </el-table-column>
             </el-table>
         </div>
-        <el-dialog :title="action == 'create' ? '创建部门' : '编辑部门'" v-model="showModal">
+        <el-dialog :title="action == 'create' ? '创建部门' : '编辑部门'" v-model="showModal" :before-close="(() => handleClose(dialogFormRef))">
             <el-form ref="dialogFormRef" :model="deptForm" :rules="rules" label-width="120px">
                 <el-form-item label="上级部门" prop="parent">
                     <el-cascader placeholder="请选择上级部门" v-model="deptForm.parent"
@@ -36,8 +36,8 @@
                     <el-input placeholder="请输入部门名称" v-model="deptForm.bmm"></el-input>
                 </el-form-item>
                 <el-form-item label="负责人" prop="bmr">
-                    <el-select placeholder="请选择部门负责人" v-model="deptForm.user" @change="handleUser">
-                        <el-option v-for="item in userList" :key="item.userid" :label="item.uname" :value="item">
+                    <el-select placeholder="请选择部门负责人" v-model="deptForm.bmr" >
+                        <el-option v-for="item in userList" :key="item.userid" :label="item.uname" :value="item.userid">
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -78,11 +78,11 @@ let columns = [
     ,
     {
         label: "更新时间",
-        prop: "updatetime",
+        prop: "update_time",
     },
     {
         label: "创建时间",
-        prop: "createtime",
+        prop: "created_time",
     },
 ];
 let deptList = ref([]);
@@ -112,7 +112,7 @@ let rules = {
             trigger: "blur",
         },
     ],
-    user: [
+    bmr: [
         {
             required: true,
             message: "请选择负责人",
@@ -135,10 +135,6 @@ function getAllUserList() {
         userList.value = list;
     })
 };
-function handleUser(val) {
-    deptForm.bmr = `${val.userid}`;
-    deptForm.umail = val.umail;
-};
 function handleReset(form) {
     form.resetFields();
 };
@@ -149,10 +145,11 @@ function handleOpen() {
 function handleEdit(row) {
     action.value = "edit";
     showModal.value = true;
+    nextTick(()=>{
         Object.assign(this.deptForm, {...row,
-            user: userList.value.find(item => item.userid == row.bmr),
             parent: [row.parent],
         });
+    })
 };
 function handleDel(_id) {
     (async () => {
@@ -163,8 +160,8 @@ function handleDel(_id) {
     })();
 };
 function handleClose(form) {
-    showModal.value = false;
     handleReset(form);
+    showModal.value = false;
 };
 function handleSubmit() {
     dialogFormRef.value.validate(async (valid) => {

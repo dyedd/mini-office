@@ -5,13 +5,13 @@ const router = require('koa-router')()
 const util = require('../utils/util')
 const jwt = require('jsonwebtoken')
 const md5 = require('md5')
-router.prefix('/jobs')
+router.prefix('/roles')
 
 // 查询所有角色列表
 router.get('/allList', async (ctx) => {
   try {
     const res = await ctx.db.execute(
-      `SELECT * FROM office_job`,
+      `SELECT * FROM office_role`,
     )
     const list = util.merge2Json(res.metaData,res.rows);
     ctx.body = util.success(list);
@@ -22,18 +22,18 @@ router.get('/allList', async (ctx) => {
 
 // 按页获取角色列表
 router.get('/list', async (ctx) => {
-  const { jobname } = ctx.request.query;
+  const { rolename } = ctx.request.query;
   const { page, skipIndex } = util.pager(ctx.request.query)
   try {
     let params = '';
     let values = [];
-    if (jobname){
-      params = 'jobname =:name ';
-      values.push(jobname);
+    if (rolename){
+      params = `INSTR(rolename, :name)>0 `;
+      values.push(rolename);
     };
     params.length > 0 ? params += ` AND rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`: params = `rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`;
     const res = await ctx.db.execute(
-      `SELECT * FROM office_job WHERE ${params}`, 
+      `SELECT * FROM office_role WHERE ${params}`, 
       values,
       {
         maxRows: page.pageSize,
@@ -55,38 +55,38 @@ router.get('/list', async (ctx) => {
 
 // 角色操作：创建、编辑和删除
 router.post('/operate', async (ctx) => {
-  const { jobid, jobname, action } = ctx.request.body;
+  const { roleid, rolename, action } = ctx.request.body;
   let res, info;
   try {
     if (action == 'create') {
       res = await ctx.db.execute(
-        `INSERT INTO office_job(jobid,jobname) VALUES (job_seq.nextval, :name)`,
-        [jobname], {
+        `INSERT INTO office_role(roleid,rolename) VALUES (role_seq.nextval, :name)`,
+        [rolename], {
             autoCommit: true
         });
       info = "创建成功"
     } else if (action == 'edit') {
-      if (jobid) {
+      if (roleid) {
         res = await ctx.db.execute(
-          `update office_job set jobname:=name WHERE jobid =:id`,
-          [jobname,jobid], {
+          `update office_role set rolename=:0 WHERE roleid =:1`,
+          [rolename,roleid], {
               autoCommit: true
           });
         info = "编辑成功"
       } else {
-        ctx.body = util.fail("缺少参数params: jobid")
+        ctx.body = util.fail("缺少参数params: roleid")
         return;
       }
     } else {
-      if (jobid) {
+      if (roleid) {
         res = await ctx.db.execute(
-          `DELETE FROM office_job WHERE BMID = :id`,
-          [jobid], {
+          `DELETE FROM office_role WHERE roleid = :id`,
+          [roleid], {
               autoCommit: true
           });
         info = "删除成功"
       } else {
-        ctx.body = util.fail("缺少参数params: jobid")
+        ctx.body = util.fail("缺少参数params: roleid")
         return;
       }
     }

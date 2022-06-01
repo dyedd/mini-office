@@ -134,7 +134,7 @@ const handlePatchDel = async () => {
   const res = await appContext.config.globalProperties.$api.userDel({
     userids: checkedUserIds.value, //可单个删除，也可批量删除
   });
-  if (res.nModified > 0) {
+  if (res.nModified > 0 || res.rowsAffected > 0) {
     ElMessage.success("删除成功");
     getUserList();
   } else {
@@ -169,7 +169,7 @@ const getRoleAllList = async () => {
 // 用户弹窗关闭
 const handleClose = () => {
   showModal.value = false;
-  handleReset("dialogForm");
+  handleReset(dialogForm);
 };
 // 用户提交
 const handleSubmit = (dialogForm) => {
@@ -180,7 +180,11 @@ const handleSubmit = (dialogForm) => {
       params.action = action.value;
       let res = await appContext.config.globalProperties.$api.userSubmit(params);
       showModal.value = false;
-      ElMessage.success("用户创建成功");
+      if(action.value == "edit"){
+        ElMessage.success("用户编辑成功");
+      }else{
+        ElMessage.success("用户创建成功");
+      }
       handleReset(dialogForm);
       getUserList();
     }
@@ -240,7 +244,7 @@ const handleEdit = (row) => {
       <el-pagination class="pagination" background layout="prev, pager, next" :total="pager.total"
         :page-size="pager.pageSize" @current-change="handleCurrentChange" />
     </div>
-    <el-dialog :title="action=='add'?'用户新增':'用户编辑'" v-model="showModal">
+    <el-dialog :title="action == 'add' ? '用户新增' : '用户编辑'" v-model="showModal">
       <el-form ref="dialogForm" :model="userForm" label-width="100px" :rules="rules">
         <el-form-item label="用户名" prop="uname">
           <el-input v-model="userForm.uname" :disabled="action == 'edit'" placeholder="请输入用户名称" />
@@ -263,16 +267,16 @@ const handleEdit = (row) => {
             <el-option value="实习" label="实习"></el-option>
           </el-select>
         </el-form-item>
-        <!-- <el-form-item label="系统角色" prop="roleList">
-          <el-select v-model="userForm.urole" placeholder="请选择用户系统角色" multiple style="width: 100%">
-            <el-option v-for="role in roleList" :key="role._id" :label="role.roleName" :value="role._id"></el-option>
+        <el-form-item label="角色" prop="roleList">
+          <el-select v-model="userForm.urole" placeholder="请选择用户角色" style="width: 100%">
+            <el-option v-for="role in roleList" :key="role.roleid" :label="role.rolename" :value="role.roleid"></el-option>
           </el-select>
-        </el-form-item> -->
-        <!-- <el-form-item label="部门" prop="deptId">
-          <el-cascader v-model="userForm.deptId" placeholder="请选择所属部门" :options="deptList"
-            :props="{ checkStrictly: true, value: '_id', label: 'deptName' }" clearable style="width: 100%">
+        </el-form-item>
+        <el-form-item label="部门" prop="deptId">
+          <el-cascader v-model="userForm.deptid" placeholder="请选择所属部门" :options="deptList"
+            :props="{ emitPath: false, value: 'bmid', label: 'bmm' }" clearable style="width: 100%">
           </el-cascader>
-        </el-form-item> -->
+        </el-form-item>
       </el-form>
       <template #footer>
         <span class="dialog-footer">
