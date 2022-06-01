@@ -45,60 +45,22 @@ const rules = reactive({
 })
 const showPermission = ref(false)
 const curRoleName = ref('')
+const curRoleId = ref(0)
 const dialogForm = ref();
 const tree = ref();
 const form = ref();
 const menuList = reactive([
   {
     label: '用户管理',
-    children: [
-      {
-        label: '新增',
-        value: 'u1'
-      },
-      {
-        label: '增加',
-        value: 'u2'
-      },
-      {
-        label: '删除',
-        value: 'u3'
-      },
-    ],
+    value: 'user'
   },
   {
     label: '部门管理',
-    children: [
-      {
-        label: '新增',
-        value: 'd1'
-      },
-      {
-        label: '增加',
-        value: 'd2'
-      },
-      {
-        label: '删除',
-        value: 'd3'
-      },
-    ],
+    value: 'dept'
   },
   {
-    label: '身份管理',
-    children: [
-      {
-        label: '新增',
-        value: 'j1'
-      },
-      {
-        label: '增加',
-        value: 'j2'
-      },
-      {
-        label: '删除',
-        value: 'j3'
-      },
-    ],
+    label: '角色管理',
+    value: 'role'
   },
 ])
 onMounted(() => {
@@ -118,8 +80,8 @@ const getRoleList = async () => {
   }
 }
 // 表单重置
-const handleReset = (form) => {
-  form.resetFields();
+const handleReset = () => {
+  form.value.resetFields();
 };
 // 角色添加
 const handleAdd = () => {
@@ -141,13 +103,13 @@ const handleDel = async (roleid) => {
   getRoleList();
 }
 // 弹框关闭
-const handleClose = (dialogForm) => {
-  handleReset(dialogForm);
+const handleClose = () => {
+  handleReset(dialogForm.value);
   showModal.value = false;
 }
 // 角色提交
-const handleSubmit = (dialogForm) => {
-  dialogForm.validate(async (valid) => {
+const handleSubmit = () => {
+  dialogForm.value.validate(async (valid) => {
     if (valid) {
       let params = toRaw(roleForm)
       params.action = action.value;
@@ -155,7 +117,7 @@ const handleSubmit = (dialogForm) => {
       if (res) {
         showModal.value = false;
         ElMessage.success("创建成功");
-        handleReset(dialogForm);
+        handleReset(dialogForm.value);
         getRoleList();
       }
     }
@@ -167,35 +129,26 @@ const handleCurrentChange = (current) => {
 }
 const handlePermission = (row) => {
   curRoleName.value = row.rolename;
+  curRoleId.value = row.roleid;
   showPermission.value = true;
+  setTimeout(() => {
+    tree.value.setCheckedKeys(JSON.parse(row.permission));
+  });
 }
-const handlePermissionSubmit = (tree)=>{
-      let nodes = tree.getCheckedNodes();
-      let halfKeys = tree.getHalfCheckedNodes();
-      console.log(nodes);
-      console.log(halfKeys);
-      let checkedKeys = [];
-      let parentKeys = [];
-      nodes.map((node) => {
-        if (!node.children) {
-          checkedKeys.push(node.value);
-        } else {
-          parentKeys.push(node.label);
-        }
-      });
-      console.log(checkedKeys,
-      parentKeys.concat(halfKeys));
-      // let params = {
-      //   _id: this.curRoleId,
-      //   permissionList: {
-      //     checkedKeys,
-      //     halfCheckedKeys: parentKeys.concat(halfKeys),
-      //   },
-      // };
-      // await this.$api.updatePermission(params);
-      // this.showPermission = false;
-      // this.$message.success("设置成功");
-      // this.getRoleList();
+const handlePermissionSubmit = async () => {
+  let nodes = tree.value.getCheckedNodes();
+  let checkedKeys = [];
+  nodes.map((node) => {
+    checkedKeys.push(node.value);
+  });
+  let params = {
+    id: curRoleId["_value"],
+    permissionList: JSON.stringify(checkedKeys),
+  };
+  await appContext.config.globalProperties.$api.updatePermission(params);
+  showPermission.value = false;
+  ElMessage.success("设置成功");
+  getRoleList();
 }
 </script>
 <template>
@@ -207,7 +160,7 @@ const handlePermissionSubmit = (tree)=>{
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="getRoleList">查询</el-button>
-          <el-button @click="handleReset(form)">重置</el-button>
+          <el-button @click="handleReset">重置</el-button>
         </el-form-item>
       </el-form>
     </div>
@@ -238,8 +191,8 @@ const handlePermissionSubmit = (tree)=>{
       </el-form>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="handleClose(dialogForm)">取 消</el-button>
-          <el-button type="primary" @click="handleSubmit(dialogForm)">确 定</el-button>
+          <el-button @click="handleClose">取 消</el-button>
+          <el-button type="primary" @click="handleSubmit">确 定</el-button>
         </span>
       </template>
     </el-dialog>
@@ -250,7 +203,7 @@ const handlePermissionSubmit = (tree)=>{
           {{ curRoleName }}
         </el-form-item>
         <el-form-item label="选择权限">
-          <el-tree ref="tree" :data="menuList" node-key="value" show-checkbox default-expand-all
+          <el-tree ref="tree" :data="menuList" node-key="value" show-checkbox
             :props="{ label: 'label' }">
           </el-tree>
         </el-form-item>
@@ -258,7 +211,7 @@ const handlePermissionSubmit = (tree)=>{
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="showPermission = false">取 消</el-button>
-          <el-button type="primary" @click="handlePermissionSubmit(tree)">确 定</el-button>
+          <el-button type="primary" @click="handlePermissionSubmit">确 定</el-button>
         </span>
       </template>
     </el-dialog>
