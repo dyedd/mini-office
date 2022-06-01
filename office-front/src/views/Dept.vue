@@ -25,26 +25,27 @@
                 </el-table-column>
             </el-table>
         </div>
-        <el-dialog :title="action == 'create' ? '创建部门' : '编辑部门'" v-model="showModal" :before-close="(() => handleClose(dialogFormRef))">
+        <el-dialog :title="action == 'create' ? '创建部门' : '编辑部门'" v-model="showModal"
+            :before-close="(() => handleClose(dialogFormRef))">
             <el-form ref="dialogFormRef" :model="deptForm" :rules="rules" label-width="120px">
                 <el-form-item label="上级部门" prop="parent">
                     <el-cascader placeholder="请选择上级部门" v-model="deptForm.parent"
-                        :props="{  value: 'bmid', label: 'bmm', checkStrictly: true }" clearable :options="deptList"
+                        :props="{ value: 'bmid', label: 'bmm', checkStrictly: true }" clearable :options="deptList"
                         :show-all-levels="true"></el-cascader>
                 </el-form-item>
                 <el-form-item label="部门名称" prop="bmm">
                     <el-input placeholder="请输入部门名称" v-model="deptForm.bmm"></el-input>
                 </el-form-item>
                 <el-form-item label="负责人" prop="bmr">
-                    <el-select placeholder="请选择部门负责人" v-model="deptForm.bmr" >
+                    <el-select placeholder="请选择部门负责人" v-model="deptForm.bmr">
                         <el-option v-for="item in userList" :key="item.userid" :label="item.uname" :value="item.userid">
                         </el-option>
                     </el-select>
                 </el-form-item>
                 <template v-if="deptForm.user">
-                <el-form-item label="负责人邮箱" prop="user.umail">
-                    <el-input placeholder="请输入负责人邮箱" v-model="deptForm.user.umail" disabled></el-input>
-                </el-form-item>
+                    <el-form-item label="负责人邮箱" prop="user.umail">
+                        <el-input placeholder="请输入负责人邮箱" v-model="deptForm.user.umail" disabled></el-input>
+                    </el-form-item>
                 </template>
             </el-form>
             <template #footer>
@@ -145,8 +146,9 @@ function handleOpen() {
 function handleEdit(row) {
     action.value = "edit";
     showModal.value = true;
-    nextTick(()=>{
-        Object.assign(this.deptForm, {...row,
+    nextTick(() => {
+        Object.assign(this.deptForm, {
+            ...row,
             parent: [row.parent],
         });
     })
@@ -154,7 +156,7 @@ function handleEdit(row) {
 function handleDel(_id) {
     (async () => {
         action.value = "delete"
-        await api.deptOperate({ params: {bmid: _id}, action: action.value });
+        await api.deptOperate({ params: { bmid: _id }, action: action.value });
         ElMessage.success("删除成功");
         getDeptList();
     })();
@@ -170,8 +172,8 @@ function handleSubmit() {
 
                 let params = { params: deptForm, action: action.value };
                 params.params.user = undefined;
-                if(params.params?.parent?.length){
-                    params.params.parent = params.params.parent[params.params.parent.length-1];
+                if (params.params?.parent?.length) {
+                    params.params.parent = params.params.parent[params.params.parent.length - 1];
                 }
                 await api.deptOperate(params);
                 ElMessage({
