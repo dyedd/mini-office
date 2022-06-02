@@ -121,8 +121,9 @@ router.post("/approve", async (ctx) => {
     action,
     leaveid,
     remark,
-    lstate
+    approver,
   } = ctx.request.body;
+  let lstate = '';
   try {
     if (action == "refuse") {
       lstate = '拒绝';
@@ -132,10 +133,11 @@ router.post("/approve", async (ctx) => {
       lstate = '作废';
     }
     await ctx.db.execute(
-      `update office_leave set lstate=:0,remark = :1 WHERE leaveid =:2`,
+      `update office_leave set lstate=:0,remark = :1,approver = :2 WHERE leaveid =:3`,
       [
         lstate,
         remark,
+        approver,
         leaveid
       ], {
         autoCommit: true

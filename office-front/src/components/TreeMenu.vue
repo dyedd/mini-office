@@ -6,7 +6,7 @@ const roleInfo = computed(() => {
   return store.state.roleInfo;
 })
 
-// current permissions: user dept role
+// current permissions: user dept role leave
 function checkPermission(permission){
   if(!roleInfo.value?.permission){
     return false;
@@ -46,6 +46,10 @@ function checkPermission(permission){
     <el-menu-item index="/system/leave" v-if="checkPermission('leave')">
       <i-ep-stamp style="margin-right: 8px" />
       <span>审批管理</span>
+    </el-menu-item>
+    <el-menu-item index="/system/approve" v-if="checkPermission('leave')">
+      <i-ep-stamp style="margin-right: 8px" />
+      <span>请假审批</span>
     </el-menu-item>
   </el-menu>
 
