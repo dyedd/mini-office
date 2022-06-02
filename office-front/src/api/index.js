@@ -134,5 +134,15 @@ export default {
         } else {
             throw new Error("Role list is empty, then how could you call getRoleById")
         }
+    },
+    // this should return candidates either (a having 'leave' permission, (b being the manager of the dept
+    async getApproverCandidatesByDeptId(bmid){
+        return request({
+            url: '/leave/who',
+            method: 'get',
+            data: {
+                bmid: bmid,
+            }
+        })
     }
 }
