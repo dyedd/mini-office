@@ -11,8 +11,7 @@
                         <el-option value="审批通过" label="审批通过"></el-option>
                         <el-option value="作废" label="作废"></el-option>
                     </el-select>
-                </el-form-item
->
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="getApplyList">查询</el-button>
                     <el-button @click="handleReset(queryFormRef)">重置</el-button>
@@ -55,7 +54,7 @@
                                     @change="(val) => handleDateChange('lstart', val)" />
                             </el-form-item>
                         </el-col>
-                        <el-col :span="1">-</el-col>
+                        <el-col :span="1"> - </el-col>
                         <el-col :span="8">
                             <el-form-item prop="lend" required>
                                 <el-date-picker v-model="leaveForm.lend" type="date" placeholder="选择结束日期"
@@ -63,9 +62,16 @@
                             </el-form-item>
                         </el-col>
                     </el-row>
-                </el-form-item>
-                <el-form-item label="休假时长" required>
+                </el-form-item> 
+                <!-- adding prop="total" to this element can make resetForm clear leaveForm.total -->
+                <el-form-item label="休假时长" required prop="total">
                     {{ leaveForm.total }} 天
+                </el-form-item>
+                <el-form-item prop="approver" label="候选人">
+                    <el-select v-model="leaveForm.approver" placeholder="选择候选人" size="small">
+                        <el-option v-for="item in approverCandidates" :key="item[0].userid" :label="item[0].uname"
+                            :value="item[0].userid" />
+                    </el-select>
                 </el-form-item>
                 <el-form-item label="休假原因" prop="reason" required>
                     <el-input type="textarea" :row="3" placeholder="请输入休假原因" v-model="leaveForm.reason" />
@@ -98,9 +104,9 @@
                     <div>{{ detail.reason }}</div>
                 </el-form-item>
                 <el-form-item label="审批状态">
-                    <div>{{ detail.lstate}}</div>
+                    <div>{{ detail.lstate }}</div>
                 </el-form-item>
-                <el-form-item label="审批人">
+                <el-form-item label="审批人ID">
                     <div>{{ detail.approver }}</div>
                 </el-form-item>
             </el-form>
@@ -111,6 +117,7 @@
 import { ElMessage } from "element-plus";
 import { getCurrentInstance, onMounted, reactive, ref, toRaw } from "vue";
 import api from "../api/index";
+import store from "../store/index"
 import utils from "../utils/utils";
 import { useStore } from 'vuex'
 const store = useStore()
@@ -164,10 +171,6 @@ const columns = reactive([
         prop: "approver",
     },
     {
-        label: "当前审批人",
-        prop: "approver",
-    },
-    {
         label: "审批状态",
         prop: "lstate",
     },
@@ -182,6 +185,8 @@ const leaveForm = reactive({
     total: 0,
     reason: "",
 });
+// 审核人候选
+const approverCandidates = ref([]);
 const queryFormRef = ref();
 const dialogForm = ref();
 //create:创建 delete:作废
@@ -214,6 +219,13 @@ const rules = {
             trigger: ["change", "blur"],
         },
     ],
+    approver: [
+        {
+            required: true,
+            message: "请选择审核人",
+            trigger: "change",
+        }
+    ]
 };
 // 初始化接口调用
 onMounted(() => {
@@ -240,6 +252,7 @@ const handleCurrentChange = (current) => {
 
 // 点击申请休假-展示弹框
 const handleApply = () => {
+    initApproverCandidates();
     showModal.value = true;
     action.value = "create";
 };
@@ -281,6 +294,13 @@ const handleSubmit = () => {
         }
     });
 };
+
+const initApproverCandidates = () => {
+
+    api.getApproverCandidatesByDeptId(store.state.userInfo.bmid).then(response => {
+        return approverCandidates.value = response
+    });
+}
 
 const handleDetail = (row) => {
     let data = { ...row };

@@ -179,6 +179,7 @@ function handleSubmit() {
 
                 let params = { params: deptForm, action: action.value };
                 params.params.user = undefined;
+                // extract last element in this array of string
                 if (params.params?.parent?.length) {
                     params.params.parent = params.params.parent[params.params.parent.length - 1];
                 }
