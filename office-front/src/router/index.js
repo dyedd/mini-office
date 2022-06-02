@@ -48,7 +48,7 @@ const routes = [
                 name: 'leave',
                 path: '/system/leave',
                 meta: {
-                    title: '审批管理'
+                    title: '休假申请'
                 },
                 component: () => import('@/views/Leave.vue')
             },{

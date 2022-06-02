@@ -49,7 +49,7 @@ const getNoticeCount = async () => {
         </div>
         <div class="user-info">
           <el-badge :is-dot="noticeCount > 0 ? true : false" class="notice" type="danger"
-            @click="router.push('/system/leave')">
+            @click="router.push('/system/approve')">
             <i-ep-bell />
           </el-badge>
           <el-dropdown @command="handleLogout">

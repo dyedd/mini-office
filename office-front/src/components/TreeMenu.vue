@@ -43,13 +43,13 @@ function checkPermission(permission){
       <i-ep-place style="margin-right: 8px" />
       <span>角色管理</span>
     </el-menu-item>
-    <el-menu-item index="/system/leave" v-if="checkPermission('leave')">
+    <el-menu-item index="/system/leave">
       <i-ep-stamp style="margin-right: 8px" />
-      <span>审批管理</span>
+      <span>休假申请</span>
     </el-menu-item>
     <el-menu-item index="/system/approve" v-if="checkPermission('leave')">
-      <i-ep-stamp style="margin-right: 8px" />
-      <span>请假审批</span>
+      <i-ep-brush style="margin-right: 8px" />
+      <span>审批管理</span>
     </el-menu-item>
   </el-menu>
 
