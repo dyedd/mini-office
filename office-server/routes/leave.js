@@ -11,13 +11,19 @@ router.prefix('/leave')
 router.get('/list', async (ctx) => {
   const {
     leavetype,
-    lstate
+    lstate,
+    action,
+    userid
   } = ctx.request.query;
   const {
     page,
     skipIndex
-  } = util.pager(ctx.request.query)
+  } = util.pager(ctx.request.query);
   try {
+    if(!userid){
+      ctx.body = util.fail('请传入userid参数');
+      return;
+    }
     let params = '';
     let values = [];
     if (leavetype) {
@@ -28,10 +34,21 @@ router.get('/list', async (ctx) => {
       params.length > 0 ? params += 'AND lstate =:state ' : params = 'lstate =:state ';
       values.push(lstate);
     };
-    params.length > 0 ? params += ` AND rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}` : params = `rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`;
+    if(action == 'create'){
+      params.length > 0 ? params += 'AND applicant =:applicant ' : params = 'applicant =:applicant ';
+    }else if(action == 'accept'){
+      params.length > 0 ? params += 'AND approver =:approver ' : params = 'approver =:approver ';
+    }else{
+      ctx.body = util.fail('请传入action参数');
+      return;
+    }
+    values.push(userid);
+    params.length > 0 ? params += ` AND ` : params = ``;
     const res = await ctx.db.execute(
-      `SELECT * FROM office_leave WHERE ${params}`,
-      values, {
+      `SELECT * FROM office_leave WHERE approver=:0 AND ${params} 
+      rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`,
+      values,
+      {
         maxRows: page.pageSize,
       }
     )
@@ -66,8 +83,8 @@ router.post("/operate", async (ctx) => {
     action,
     params,
   } = ctx.request.body
-  params.lstart = new Date(params.lstart);
-  params.lend = new Date(params.lend);
+  // params.lstart = new Date(params.lstart);
+  // params.lend = new Date(params.lend);
   let authorization = ctx.request.headers.authorization;
   let {
     userid

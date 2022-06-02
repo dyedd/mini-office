@@ -189,7 +189,7 @@ onMounted(() => {
 
 // 加载申请列表
 const getApplyList = async () => {
-    let params = { ...queryForm, ...pager, type: "approve" };
+    let params = { ...queryForm, ...pager, action:'accept',userid: store.state.userInfo.userid};
     let { list, page } = await api.getApplyList(params);
     applyList.value = list;
     pager.total = page.total;

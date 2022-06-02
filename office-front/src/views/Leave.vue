@@ -112,6 +112,8 @@ import { ElMessage } from "element-plus";
 import { getCurrentInstance, onMounted, reactive, ref, toRaw } from "vue";
 import api from "../api/index";
 import utils from "../utils/utils";
+import { useStore } from 'vuex'
+const store = useStore()
 const queryForm = reactive({
     lstate: "待审批",
 });
@@ -220,7 +222,7 @@ onMounted(() => {
 
 // 加载申请列表
 const getApplyList = async () => {
-    let params = { ...queryForm, ...pager };
+    let params = { ...queryForm, ...pager, action:'create',userid: store.state.userInfo.userid};
     let { list, page } = await api.getApplyList(params);
     applyList.value = list;
     pager.total = page.total;
