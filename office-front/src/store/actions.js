@@ -1,9 +1,8 @@
-import { useStore } from "vuex";
+import store from "./index"
 import api from "../api/index"
-const store = useStore();
 export default {
   async fetchRoleInfo(){
-    if(!store.state.UserInfo?.urole){
+    if(!store.state.userInfo?.urole){
       return;
     }
     const roleId = store.state.userInfo.urole;
