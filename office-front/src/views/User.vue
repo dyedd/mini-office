@@ -61,10 +61,17 @@ const columns = reactive([
   {
     label: "用户邮箱",
     prop: "umail",
+    formatter(row, column, value) {
+        return `${value}@tust.edu.cn`;
+    },
   },
   {
     label: "用户角色",
     prop: "urole",
+    formatter(row, column, value) {
+      console.log(roleList.value.find(v=>v.roleid == row.urole));
+      return roleList.value.find(v=>v.roleid == row.urole)?.rolename || ''
+    },
   },
   {
     label: "用户状态",
