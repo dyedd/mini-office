@@ -148,4 +148,19 @@ router.post("/approve", async (ctx) => {
   }
 })
 
+router.get("/who", async (ctx) => {
+  const {
+    bmid,
+    urole
+  } = ctx.request.query;
+  try {
+    const res = await ctx.db.execute(
+      `select bmr from office_bm where BMID =: 0`,
+      [bmid]
+    )
+    ctx.body = util.success(res.rows[0][0])
+  } catch (error) {
+    ctx.body = util.fail(`查询异常：${error.message}`)
+  }
+})
 module.exports = router;

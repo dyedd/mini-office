@@ -146,4 +146,8 @@ const getNoticeCount = async () => {
     }
   }
 }
+.el-badge__content.is-fixed.is-dot {
+    right: 5px;
+    top: 10px;
+}
 </style>
