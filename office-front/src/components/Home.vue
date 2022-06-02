@@ -1,33 +1,33 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { getCurrentInstance, ref, computed, onMounted } from "vue";
 import TreeMenu from "./TreeMenu.vue";
 import BreadCrumb from "./BreadCrumb.vue";
 import { useStore } from 'vuex'
+import { useRouter } from 'vue-router'
 const store = useStore()
-import router from "../router/index";
-
+const router = useRouter()
+const { appContext } = getCurrentInstance();
 let userInfo = store.state.userInfo
-const noticeCount = computed(() => {
-  return store.state.noticeCount
-})
-onMounted(() => {
-  // getNoticeCount();
-  // getMenuList();
-})
 const handleLogout = (key) => {
   if (key == "email") return;
   store.commit("saveUserInfo", "");
   userInfo = {};
   router.push("/login");
 }
-// const getNoticeCount = async () => {
-//   try {
-//     const count = await this.$api.noticeCount();
-//     store.commit("saveNoticeCount", count);
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }
+const noticeCount = computed(() => {
+  return store.state.noticeCount;
+})
+onMounted(()=>{
+  getNoticeCount()
+})
+const getNoticeCount = async () => {
+  try {
+    const count = await appContext.config.globalProperties.$api.noticeCount();
+    store.commit("saveNoticeCount", count);
+  } catch (error) {
+    console.error(error);
+  }
+}
 </script>
 <template>
   <div class="basic-layout">
@@ -48,13 +48,17 @@ const handleLogout = (key) => {
           </div>
         </div>
         <div class="user-info">
+          <el-badge :is-dot="noticeCount > 0 ? true : false" class="notice" type="danger"
+            @click="router.push('/system/leave')">
+            <i-ep-bell />
+          </el-badge>
           <el-dropdown @command="handleLogout">
             <span class="user-link">
               {{ userInfo.uname }}
             </span>
             <template #dropdown>
               <el-dropdown-menu>
-                <el-dropdown-item command="email">邮箱：{{ userInfo.umail }}</el-dropdown-item>
+                <el-dropdown-item command="email">邮箱：{{ userInfo.umail }}@tust.edu.cn</el-dropdown-item>
                 <el-dropdown-item command="logout">退出</el-dropdown-item>
               </el-dropdown-menu>
             </template>
@@ -119,7 +123,10 @@ const handleLogout = (key) => {
       .user-info {
         display: flex;
         align-items: center;
-
+        .notice {
+          margin-right: 15px;
+          cursor: pointer;
+        }
         .user-link {
           cursor: pointer;
           color: #409eff;

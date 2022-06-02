@@ -2,7 +2,6 @@
 import { ref, reactive, computed } from "vue";
 import store from "../store/index";
 const activeMenu = ref(location.hash.slice(1));
-// I wonder just saving a variable from store to local varibale, will the variable still be reactive?
 const roleInfo = computed(() => {
   return store.state.roleInfo;
 })
@@ -32,19 +31,19 @@ function checkPermission(permission){
       <i-ep-setting style="margin-right: 8px" />
       <span>系统管理</span>
     </el-menu-item>
-    <el-menu-item index="/system/user" :disabled="!checkPermission(['user'])">
+    <el-menu-item index="/system/user" v-if="checkPermission(['user'])">
       <i-ep-user style="margin-right: 8px" />
       <span>用户管理</span>
     </el-menu-item>
-    <el-menu-item index="/system/dept" :disabled="!checkPermission('dept')">
+    <el-menu-item index="/system/dept" v-if="checkPermission('dept')">
       <i-ep-stopwatch style="margin-right: 8px" />
       <span>部门管理</span>
     </el-menu-item>
-    <el-menu-item index="/system/role" :disabled="!checkPermission('role')">
+    <el-menu-item index="/system/role" v-if="checkPermission('role')">
       <i-ep-place style="margin-right: 8px" />
       <span>角色管理</span>
     </el-menu-item>
-    <el-menu-item index="/system/leave">
+    <el-menu-item index="/system/leave" v-if="checkPermission('leave')">
       <i-ep-stamp style="margin-right: 8px" />
       <span>审批管理</span>
     </el-menu-item>

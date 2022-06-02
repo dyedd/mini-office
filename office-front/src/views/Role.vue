@@ -63,6 +63,10 @@ const menuList = reactive([
     label: '角色管理',
     value: 'role'
   },
+  {
+    label: '审批管理',
+    value: 'leave'
+  },
 ])
 onMounted(() => {
   getRoleList();

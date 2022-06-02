@@ -18,22 +18,6 @@ export default {
             mock: false
         })
     },
-    getMenuList(params) {
-        return request({
-            url: '/menu/list',
-            method: 'get',
-            data: params,
-            mock: false
-        })
-    },
-    getPermissionList() {
-        return request({
-            url: '/users/getPermissionList',
-            method: 'get',
-            data: {},
-            mock: false
-        })
-    },
     getUserList(params) {
         return request({
             url: '/users/list',
@@ -96,14 +80,6 @@ export default {
             mock: false
         })
     },
-    menuSubmit(params) {
-        return request({
-            url: '/menu/operate',
-            method: 'post',
-            data: params,
-            mock: false
-        })
-    },
     roleOperate(params) {
         return request({
             url: '/roles/operate',
@@ -144,20 +120,19 @@ export default {
             mock: false
         })
     },
-    getRoleByID(id){
+    async getRoleByID(id){
         if(id == null){
             throw new Error("id should not be null or undefined");
         }
         // since there isn't a corresponding function in the backend
         // just get all roles and find the one by id
-        return this.getRoleAllList().then((response)=>{
-            if(response && response.length!==0){
-                const result = response.find(item => item.roleid==id);
-                result.permission = JSON.parse(result.permission);
-                return result;
-            }else {
-                throw new Error("Role list is empty, then how could you call getRoleById");
-            }
-        });
+        const response = await this.getRoleAllList()
+        if (response && response.length !== 0) {
+            const result_1 = response.find(item => item.roleid == id)
+            result_1.permission = JSON.parse(result_1.permission)
+            return result_1
+        } else {
+            throw new Error("Role list is empty, then how could you call getRoleById")
+        }
     }
 }
