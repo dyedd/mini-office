@@ -266,6 +266,8 @@ const handleSubmit = () => {
     dialogForm.value.validate(async (valid) => {
         if (valid) {
             try {
+                leaveForm.lstart = utils.formateDate(new Date(leaveForm.lstart), "yyyy/MM/dd")
+                leaveForm.lend = utils.formateDate(new Date(leaveForm.lend), "yyyy/MM/dd")
                 let params = { params: leaveForm, action: action.value };
                 let res = await api.leaveOperate(params);
                 ElMessage.success("创建成功");
