@@ -45,7 +45,7 @@ router.get('/list', async (ctx) => {
     values.push(userid);
     params.length > 0 ? params += ` AND ` : params = ``;
     const res = await ctx.db.execute(
-      `SELECT * FROM office_leave WHERE approver=:0 AND ${params} 
+      `SELECT * FROM office_leave WHERE  ${params} 
       rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`,
       values,
       {
@@ -98,7 +98,7 @@ router.post("/operate", async (ctx) => {
     orderNo += number.rows[0][0];
     const res = await ctx.db.execute(
       `INSERT INTO office_leave(leaveid,leavetype,lstart,lend,reason,lstate,applicant,approver) 
-      VALUES (:0,:1,:2,:3,:4,:5,:6,:7)`,
+      VALUES (:0,:1,to_date(:2, 'yyyy/MM/dd'),to_date(:3, 'yyyy/MM/dd'),:4,:5,:6,:7)`,
       [
         orderNo,
         params.leavetype,

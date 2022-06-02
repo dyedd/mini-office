@@ -117,7 +117,6 @@
 import { ElMessage } from "element-plus";
 import { getCurrentInstance, onMounted, reactive, ref, toRaw } from "vue";
 import api from "../api/index";
-import store from "../store/index"
 import utils from "../utils/utils";
 import { useStore } from 'vuex'
 const store = useStore()
