@@ -51,7 +51,7 @@ const rules = reactive({
 // 定义动态表格-格式
 const columns = reactive([
   {
-    label: "用户ID",
+    label: "ID",
     prop: "userid",
   },
   {
@@ -59,21 +59,25 @@ const columns = reactive([
     prop: "uname",
   },
   {
-    label: "用户邮箱",
+    label: "邮箱",
     prop: "umail",
     formatter(row, column, value) {
         return `${value}@tust.edu.cn`;
     },
   },
   {
-    label: "用户角色",
+    label: "角色",
     prop: "urole",
     formatter(row, column, value) {
       return roleList.value.find(v=>v.roleid == row.urole)?.rolename || ''
     },
   },
+    {
+    label: "岗位",
+    prop: "job",
+  },
   {
-    label: "用户状态",
+    label: "状态",
     prop: "ustate",
   },
   {
