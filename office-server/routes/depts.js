@@ -10,11 +10,11 @@ router.get('/list', async (ctx) => {
     let result;
     if (deptname) {
         result = await ctx.db.execute(
-            `SELECT * FROM office_bm where bmm = :name`,
+            `SELECT * FROM office_bm o left join BM_NUM_VIEW b on o.bmid = b.deptid where o.bmm = :name`,
             [deptname]);
     } else {
         result = await ctx.db.execute(
-            `SELECT * FROM office_bm`
+            `SELECT * FROM office_bm o left join BM_NUM_VIEW b on o.bmid = b.deptid`
         );
     }
 

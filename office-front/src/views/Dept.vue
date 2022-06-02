@@ -78,6 +78,13 @@ let columns = [
     }
     ,
     {
+        label: "部门人数",
+        prop: "bmnum",
+        formatter(row, column, value) {
+            return value>0?value:0
+        },
+    },
+    {
         label: "更新时间",
         prop: "update_time",
     },

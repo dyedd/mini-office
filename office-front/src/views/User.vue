@@ -69,7 +69,6 @@ const columns = reactive([
     label: "用户角色",
     prop: "urole",
     formatter(row, column, value) {
-      console.log(roleList.value.find(v=>v.roleid == row.urole));
       return roleList.value.find(v=>v.roleid == row.urole)?.rolename || ''
     },
   },
