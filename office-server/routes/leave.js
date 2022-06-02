@@ -150,15 +150,21 @@ router.post("/approve", async (ctx) => {
 
 router.get("/who", async (ctx) => {
   const {
-    bmid,
-    urole
+    bmid
   } = ctx.request.query;
   try {
     const res = await ctx.db.execute(
-      `select bmr from office_bm where BMID =: 0`,
+      `select * from office_users u left join office_role r on u.urole = r.roleid 
+      where r.permission like '%leave%' 
+      OR u.userid = (select bmr from office_bm where bmid = :0)`,
       [bmid]
     )
-    ctx.body = util.success(res.rows[0][0])
+    let list = [];
+    for (const row of res.rows) {
+      list.push(util.merge2Json(res.metaData,[row]));
+    }
+    
+    ctx.body = util.success(list)
   } catch (error) {
     ctx.body = util.fail(`查询异常：${error.message}`)
   }
