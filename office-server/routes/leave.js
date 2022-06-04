@@ -67,9 +67,14 @@ router.get('/list', async (ctx) => {
 })
 
 router.get("/count", async (ctx) => {
+  let authorization = ctx.request.headers.authorization;
+  let {
+    userid
+  } = util.decoded(authorization)
   try {
     const res = await ctx.db.execute(
-      `SELECT count(*) FROM office_leave`,
+      `SELECT count(*) FROM office_leave WHERE approver =:approver and lstate='待审批'`,
+      [userid]
     )
     ctx.body = util.success(res.rows[0][0])
   } catch (error) {
@@ -83,8 +88,6 @@ router.post("/operate", async (ctx) => {
     action,
     params,
   } = ctx.request.body
-  // params.lstart = new Date(params.lstart);
-  // params.lend = new Date(params.lend);
   let authorization = ctx.request.headers.authorization;
   let {
     userid
