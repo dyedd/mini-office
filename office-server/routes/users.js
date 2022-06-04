@@ -70,11 +70,11 @@ router.get('/list', async (ctx) => {
     params.length > 0 ? params += 'AND ustate =:v_state ' : params = 'ustate =:v_state';
     values.push(state)
   }
-  params.length > 0 ? params += ` AND rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`: params = `rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`;
+  params.length > 0 ? params += ` AND `: params = ``;
   try {
     // 根据条件查询所有用户列表
     const res = await ctx.db.execute(
-      `SELECT * FROM USER_VIEW WHERE ${params}`, 
+      `SELECT * FROM USER_VIEW WHERE ${params} rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`, 
       values,
       {
         maxRows: page.pageSize,

@@ -190,7 +190,7 @@ const handlePermissionSubmit = async () => {
       <el-pagination class="pagination" background layout="prev, pager, next" :total="pager.total"
         :page-size="pager.pageSize" @current-change="handleCurrentChange" />
     </div>
-    <el-dialog title="角色新增" v-model="showModal">
+    <el-dialog :title="action == 'add' ? '角色新增' : '角色编辑'" v-model="showModal">
       <el-form ref="dialogForm" :model="roleForm" label-width="100px" :rules="rules">
         <el-form-item label="角色名称" prop="rolename">
           <el-input v-model="roleForm.rolename" placeholder="请输入角色名称" />
