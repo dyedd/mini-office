@@ -40,7 +40,7 @@ const rules = reactive({
   umail: [
     { required: true, message: "请输入用户邮箱", trigger: "blur" },
   ],
-  mobile: [
+  umobile: [
     {
       pattern: /1[3-9]\d{9}/,
       message: "请输入正确的手机号格式",
@@ -264,7 +264,7 @@ const handleEdit = (row) => {
             <template #append>@edu.tust.cn</template>
           </el-input>
         </el-form-item>
-        <el-form-item label="手机号" prop="mobile">
+        <el-form-item label="手机号" prop="umobile">
           <el-input v-model="userForm.umobile" placeholder="请输入手机号" />
         </el-form-item>
         <el-form-item label="岗位">

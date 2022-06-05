@@ -35,7 +35,7 @@ service.interceptors.response.use((res) => {
         }, 1000)
         return Promise.reject(TOKEN_INVALID)
     } else {
-        ElMessage.error(msg || NETWORK_ERROR)
+        ElMessage.error(`${code}: ${msg}` || NETWORK_ERROR)
         return Promise.reject(msg || NETWORK_ERROR)
     }
 })
