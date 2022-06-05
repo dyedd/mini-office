@@ -153,15 +153,15 @@ router.post("/approve", async (ctx) => {
       lstate = '作废';
     }
     await ctx.db.execute(
-      `update office_leave set lstate=:0,remark = :1,approver = :2 WHERE leaveid =:3`,
+      `BEGIN
+        approve_leave(:lstate, :remark, :approver, :v_leaveid);
+      END`,
       [
         lstate,
         remark,
         approver,
         leaveid
-      ], {
-        autoCommit: true
-      });
+      ]);
     ctx.body = util.success("", "处理成功");
   } catch (error) {
     ctx.body = util.fail(`查询异常：${error.message}`)
