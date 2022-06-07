@@ -46,7 +46,7 @@ router.get('/list', async (ctx) => {
     params.length > 0 ? params += ` AND ` : params = ``;
     const res = await ctx.db.execute(
       `SELECT * FROM office_leave WHERE  ${params} 
-      rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1}`,
+      rownum >= ${skipIndex} AND rownum <= ${skipIndex + page.pageSize - 1} order by total`,
       values,
       {
         maxRows: page.pageSize,
