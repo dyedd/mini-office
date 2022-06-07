@@ -98,7 +98,7 @@ router.get('/list', async (ctx) => {
 router.get('/all/list', async (ctx) => {
   try {
     const res = await ctx.db.execute(
-      `SELECT * FROM USER_VIEW`,
+      `SELECT userid,uname,umail,nvl(urole,'员工‘),nvl(job,'新入职'),ustate,created_time,update_time FROM USER_VIEW`,
     )
     const list = util.merge2Json(res.metaData,res.rows);
     ctx.body = util.success(list)
